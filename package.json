@@ -1,17 +1,31 @@
 {
   "name": "arkeos-split-panel",
-  "version": "2022.1001.550",
+  "version": "2022.1001.713",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
+  "module": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "yarn webpack --mode development",
+    "build-prod": "yarn webpack --mode production",
+    "server": "yarn webpack server --port 4200 --https --http2 --mode development --no-live-reload --open"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/lodash": "^4.14.185",
+    "css-loader": "^6.7.1",
+    "extract-loader": "^5.1.0",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.5.0",
     "lodash": "^4.17.21",
+    "sass": "^1.54.9",
+    "sass-loader": "^13.0.2",
+    "style-loader": "^3.3.1",
+    "ts-loader": "^9.4.1",
+    "typescript": "^4.8.4",
     "webpack": "^5.74.0",
-    "webpack-cli": "^4.10.0"
+    "webpack-cli": "^4.10.0",
+    "x-tag": "^2.0.3-beta"
   }
 }

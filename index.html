@@ -1,0 +1,46 @@
+<div id="libary-test"></div>
+
+<div style="width: 100%; height: 100%;" id="component-test">
+    <arkeos-split-panel orientation="horizontal">
+        <arkeos-panel ratio="70">
+            <arkeos-split-panel orientation="vertical">
+                <arkeos-panel ratio="70">
+                    Top left panel
+                </arkeos-panel>
+                <arkeos-panel ratio="30">
+                    Top right panel
+                </arkeos-panel>            
+            </arkeos-split-panel>                
+        </arkeos-panel>
+        <arkeos-panel ratio="100">
+                Bottom panel
+        </arkeos-panel>    
+    </arkeos-split-panel>
+</div>
+
+<script src="./dist/x-tag-raw.min.js" ></script>
+<script src="./dist/index.js" ></script>
+
+<script>
+    let library = "arkeos-split-panel"
+    var div = document.querySelector('#libary-test');
+    var myLib = window[library];
+    var exports = Object.keys(myLib).reduce((acum, element) => `
+${acum}<tr><th/><th>${element}</th><th>${myLib[element].version}</th></tr>
+`, '');
+    div.innerHTML += `<table>
+<tr>
+    <th>Library</th><th>Loaded</th>        
+</tr>
+<tr>
+    <th>${library}</th><th>${!!myLib}</th>        
+</tr>
+<tbody>
+${exports}
+</tbody>
+</table>
+`
+    var divTest = document.querySelector('#component-test');
+    customElements.upgrade(divTest);
+
+</script>
