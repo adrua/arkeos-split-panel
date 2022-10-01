@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-      "outDir": "./dist/",
+      "outDir": "../dist/arkeos-split-panel/",
       "sourceMap": true,
       "noImplicitAny": true,
       "module": "None",
@@ -8,6 +8,8 @@
       "jsx": "react",
       "allowJs": true,
       "moduleResolution": "node",
+      "declaration": true,
+      "declarationDir": "../dist/arkeos-split-panel/",
       "typeRoots": [ 
         "./node_modules/@types"
       ]

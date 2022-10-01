@@ -3,7 +3,7 @@
   "version": "2022.1001.713",
   "description": "",
   "main": "index.ts",
-  "module": "dist/index.js",
+  "module": "../dist/arkeos-split-panel/index.js",
   "scripts": {
     "build": "yarn webpack --mode development",
     "build-prod": "yarn webpack --mode production",

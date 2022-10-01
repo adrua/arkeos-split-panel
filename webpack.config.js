@@ -2,6 +2,14 @@ const path = require('path');
 
 module.exports = {
   entry:   path.resolve(__dirname, "./src/index.ts"),
+  output: {
+    path: path.resolve(__dirname, '../dist/arkeos-split-panel'),
+    filename: 'index.js',
+    library: {
+        name: 'arkeos-split-panel',
+        type: 'umd',
+    },
+  },
   devtool: 'inline-source-map',
   module: {
     rules: [
@@ -45,14 +53,6 @@ module.exports = {
         ]
       }
     ],
-  },
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'index.js',
-    library: {
-        name: 'arkeos-split-panel',
-        type: 'umd',
-    },
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],

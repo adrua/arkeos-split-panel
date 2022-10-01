@@ -295,10 +295,6 @@ export class ArkeosSplitPanel extends XTagElement {
 
     }
 
-    adoptedCallback() {
-        this.preRender();
-    }
-
     constructor() {
         super();
 
