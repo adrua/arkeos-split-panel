@@ -56,6 +56,8 @@ export class ArkeosPanel extends XTagElement  {
         let host_style = document.createAttribute("style");
         host_style.value = "overflow: auto; position: absolute; borderWidth: 1px; borderStyle: solid; borderColor: green; zIndex: 1; ";
         this.host.setAttributeNode(host_style);
+        
+        this.host.classList.add("arkeos-split-target");
 
         if(this.host.getAttribute("ratio")) {
             let host_ratio = document.createAttribute("ratio");

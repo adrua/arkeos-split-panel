@@ -169,12 +169,14 @@ export class ArkeosSplitPanel extends XTagElement {
         attr.value = "position: absolute; color: black; background-color: black; border-width: 1px; border-style: solid; borderColor: black; z-index: 2; transform: none !important";
 
         split.setAttributeNode(attr);
+
+        split.classList.add("arkeos-split");
     }
 
-    'dragstart::event:delegate(div)'(ev:DragEvent) {     
+    'dragstart::event:delegate(.arkeos-split)'(ev:DragEvent) {     
         let _host =  ev.currentTarget as unknown as ArkeosSplitPanel;
    
-        if(this.parentElement?.parentElement === _host) {
+        if((ev.target as any).classList.contains("arkeos-split")) {
             let _split = ev.target as HTMLDivElement
             _host.currentSplit = _split;
 
@@ -198,19 +200,23 @@ export class ArkeosSplitPanel extends XTagElement {
         } 
     }
 
-    'dragover::event:delegate(arkeos-panel)'(ev: DragEvent) {
+    'dragover::event:delegate(.arkeos-split-target)'(ev: DragEvent) {
         let _host =  ev.currentTarget as unknown as ArkeosSplitPanel;
-        let _split = _host.currentSplit;
-        let _splitHost = _split?.parentElement?.parentElement as unknown as ArkeosSplitPanel;
-        if(_splitHost === _host) {        
-            var inx = parseInt(_split.getAttribute("index"));
-            _host.dragMethod(ev, inx);
+        if(_host.currentSplit) {
+            let _split = _host.currentSplit;
+            let _splitHost = _split?.parentElement?.parentElement as unknown as ArkeosSplitPanel;
+            if(_splitHost === _host) {        
+                var inx = parseInt(_split.getAttribute("index"));
+                _host.dragMethod(ev, inx);
+            }
         }
     }
 
     'dragend::event'(ev: DragEvent) {
         let _host =  ev.currentTarget as unknown as ArkeosSplitPanel;
-        _host.currentSplit = null;
+        if(_host.currentSplit) {
+            _host.currentSplit = null;
+        }
     }
 
     'resfresh::event'(ev: Event) {
