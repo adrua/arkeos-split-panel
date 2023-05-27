@@ -40,6 +40,9 @@ export class ArkeosSplitPanel extends XTagElement {
     private setSplitMethod = this.setSplitVertical;
     private dragMethod = this.dragVertical;
 
+    private readonly _dragId = new Date().getTime();
+    private readonly _dragType = `arkeos-split-${this._dragId}`;
+
     //Attributes
     set 'select::attr'(val) {
         this._select = val;
@@ -69,7 +72,6 @@ export class ArkeosSplitPanel extends XTagElement {
         this.setPanelMethod = bVertical ? this.setPanelVertical : this.setPanelHorizontal;
         this.initSplitMethod = bVertical ? this.initSplitVertical : this.initSplitHorizontal;
         this.setSplitMethod = bVertical ? this.setSplitVertical : this.setSplitHorizontal;
-        
     }
 
     //Events
@@ -98,7 +100,7 @@ export class ArkeosSplitPanel extends XTagElement {
         panel.master = this;
         panel.style.left = `${displacement}px`;
         panel.style.top = "0px";
-        panel.update();
+        panel.update(this);
 
         return parseFloat(panel.style.width);
     }
@@ -130,7 +132,7 @@ export class ArkeosSplitPanel extends XTagElement {
         panel.master = this;
         panel.style.left = "0px";
         panel.style.top = `${displacement}px`;
-        panel.update();
+        panel.update(this);
 
         return parseInt(panel.style.height);
     }
@@ -165,58 +167,62 @@ export class ArkeosSplitPanel extends XTagElement {
         attr.value = inx.toString();
         split.setAttributeNode(attr);
 
-        attr = document.createAttribute("style");
-        attr.value = "position: absolute; color: black; background-color: black; border-width: 1px; border-style: solid; borderColor: black; z-index: 2; transform: none !important";
-
-        split.setAttributeNode(attr);
+        split.style.position = "absolute";
+        split.style.color = "black";
+        split.style.backgroundColor = "black";
+        split.style.borderWidth = "1px";
+        split.style.borderStyle = "solid";
+        split.style.borderColor = "black";
+        split.style.zIndex = "2";
+        split.style.transform = "none !important";
 
         split.classList.add("arkeos-split");
     }
 
     'dragstart::event:delegate(.arkeos-split)'(ev:DragEvent) {     
-        let _host =  ev.currentTarget as unknown as ArkeosSplitPanel;
+        let _split = ev.target as HTMLDivElement
+        let _host = _split.closest<HTMLElement>('arkeos-split-panel') as unknown as ArkeosSplitPanel;
    
-        if((ev.target as any).classList.contains("arkeos-split")) {
-            let _split = ev.target as HTMLDivElement
-            _host.currentSplit = _split;
+        _split.setAttribute("_dragType",  _host._dragType);
+        _split.classList.add('arkeos-split-active');
+        _host.currentSplit = _split;
 
-            _host.currentSplitX = parseFloat(_split.style.left);
-            _host.currentSplitY = parseFloat(_split.style.top);
-    
-            let index = parseInt(_split.getAttribute("index"));
-            let panel = _host._panels[index - 1];
-            _host.currentPanel1X = parseFloat(panel.host.style.left);
-            _host.currentPanel1Y = parseFloat(panel.host.style.top);
-            _host.currentPanel1W = parseFloat(panel.host.style.width);
-            _host.currentPanel1H = parseFloat(panel.host.style.height);
-            _host.currentPanel1R = panel.ratio;
-    
-            panel = _host._panels[index];
-            _host.currentPanel2X = parseFloat(panel.host.style.left);
-            _host.currentPanel2Y = parseFloat(panel.host.style.top);
-            _host.currentPanel2W = parseFloat(panel.host.style.width);
-            _host.currentPanel2H = parseFloat(panel.host.style.height);
-            _host.currentPanel2R = panel.ratio;
-        } 
+        ev.dataTransfer.dropEffect = "move";
+
+        _host.currentSplitX = ev.screenX;
+        _host.currentSplitY = ev.screenY;
+
+        let index = parseInt(_split.getAttribute("index"));
+        let panel = _host._panels[index - 1];
+        _host.currentPanel1X = parseFloat(panel.host.style.left);
+        _host.currentPanel1Y = parseFloat(panel.host.style.top);
+        _host.currentPanel1W = parseFloat(panel.host.style.width);
+        _host.currentPanel1H = parseFloat(panel.host.style.height);
+        _host.currentPanel1R = panel.ratio;
+
+        panel = _host._panels[index];
+        _host.currentPanel2X = parseFloat(panel.host.style.left);
+        _host.currentPanel2Y = parseFloat(panel.host.style.top);
+        _host.currentPanel2W = parseFloat(panel.host.style.width);
+        _host.currentPanel2H = parseFloat(panel.host.style.height);
+        _host.currentPanel2R = panel.ratio;
+
     }
 
     'dragover::event:delegate(.arkeos-split-target)'(ev: DragEvent) {
-        let _host =  ev.currentTarget as unknown as ArkeosSplitPanel;
-        if(_host.currentSplit) {
-            let _split = _host.currentSplit;
-            let _splitHost = _split?.parentElement?.parentElement as unknown as ArkeosSplitPanel;
-            if(_splitHost === _host) {        
-                var inx = parseInt(_split.getAttribute("index"));
-                _host.dragMethod(ev, inx);
-            }
+        let _split = document.querySelector('.arkeos-split-active');
+        let _host = _split.closest<HTMLElement>('arkeos-split-panel') as unknown as ArkeosSplitPanel;
+        if(_split.getAttribute("_dragType") === _host._dragType) {
+            ev.preventDefault();
+            ev.dataTransfer.dropEffect = "move";
+            var inx = parseInt(_split.getAttribute("index"));
+            _host.dragMethod(ev, inx);
         }
     }
 
-    'dragend::event'(ev: DragEvent) {
-        let _host =  ev.currentTarget as unknown as ArkeosSplitPanel;
-        if(_host.currentSplit) {
-            _host.currentSplit = null;
-        }
+    'dragend::event:delegate(.arkeos-split)'(ev: DragEvent) {
+        let _split = document.querySelector('.arkeos-split-active');
+        _split?.classList.remove('arkeos-split-active');
     }
 
     'resfresh::event'(ev: Event) {
@@ -225,7 +231,7 @@ export class ArkeosSplitPanel extends XTagElement {
     }
 
     dragVertical(e: DragEvent, inx: number) {
-        let x = this.currentSplitX - e.x;
+        let x = this.currentSplitX - e.screenX;
 
         let ratio = (this.currentPanel1R + this.currentPanel2R);
 
@@ -238,12 +244,11 @@ export class ArkeosSplitPanel extends XTagElement {
         panel.host.style.left = `${this.currentPanel2X - x}px`;
         panel["ratio"] = (width2 * ratio / (width1 + width2)).toString();
         this._panels[inx - 1]["ratio"] = (width1 * ratio / (width1 + width2)).toString();
-        this.currentSplit.style.left = `${e.x}px`;
-        this.currentSplit.style.top = `${this.currentSplitY}px`;    
+        this.currentSplit.style.left = `${width1}px`;
     }
 
     dragHorizontal(e: DragEvent, inx: number) {
-        let y = this.currentSplitY - e.y;
+        let y = this.currentSplitY - e.screenY;
 
         let ratio = (this.currentPanel1R + this.currentPanel2R) ;
         //Arriba
@@ -257,8 +262,7 @@ export class ArkeosSplitPanel extends XTagElement {
         this._panels[inx - 1]["ratio"] = (height1 * ratio / (height1 + height2)).toString();
         panel["ratio"] = (height2 * ratio / (height1 + height2)).toString();
 
-        this.currentSplit.style.left = `${this.currentSplitX}px`;
-        this.currentSplit.style.top = `${e.y}px`;
+        this.currentSplit.style.top = `${height1}px`;
     }
 
     //View
@@ -267,9 +271,10 @@ export class ArkeosSplitPanel extends XTagElement {
         this._panels = Array.from(this.host.children || []).filter((child) => child.localName === 'arkeos-panel') as unknown as Array<ArkeosPanel>;
 
         let container = document.createElement("div");
-        let container_style = document.createAttribute("style");
-        container_style.value = "width: 100%; height: 100%; display: block; overflow: none;";
-        container.setAttributeNode(container_style);
+        container.style.width = "100%"; 
+        container.style.height = "100%"; 
+        container.style.display = "block"; 
+        container.style.overflow ="none";
         
         this._panels.map((panel) => {
             container.appendChild(panel as unknown as HTMLElement);
@@ -305,10 +310,14 @@ export class ArkeosSplitPanel extends XTagElement {
         super();
 
         this.host = this as unknown as HTMLElement;
-
-        let host_style = document.createAttribute("style");
-        host_style.value = "left: 0px; top = 0px; width: calc(100% - 2px); height: calc(100% - 2px); display: block; overflow: none; position: absolute";
-        this.host.setAttributeNode(host_style);
+ 
+        this.host.style.left = "0px"; 
+        this.host.style.top = "0px"; 
+        this.host.style.width = "calc(100% - 2px)"; 
+        this.host.style.height = "calc(100% - 2px)"; 
+        this.host.style.display = "block"; 
+        this.host.style.overflow = "none"; 
+        this.host.style.position = "absolute";
 
         this.preRender();
 

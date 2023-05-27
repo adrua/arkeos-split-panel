@@ -9,15 +9,6 @@ export class ArkeosPanel extends XTagElement  {
     private _parent: ArkeosSplitPanel;
     public host: HTMLElement;
 
-    get 'master::attr'() {
-        return this._parent;
-    }
-
-    set 'master::attr'(value: ArkeosSplitPanel) {
-        this._parent = value;
-        this.promise.then(() => this.update());
-    }
-
     private _caption = "";
     get 'caption::attr'() {
         return this._caption;
@@ -53,40 +44,31 @@ export class ArkeosPanel extends XTagElement  {
 
         this.host = this as unknown as HTMLElement;
 
-        let host_style = document.createAttribute("style");
-        host_style.value = "overflow: auto; position: absolute; borderWidth: 1px; borderStyle: solid; borderColor: green; zIndex: 1; ";
-        this.host.setAttributeNode(host_style);
+        this.host.style.overflow = "auto";
+        this.host.style.position = "absolute";
+        this.host.style.borderWidth = "1px";
+        this.host.style.borderStyle = "solid";
+        this.host.style.borderColor = "green";
+        this.host.style.zIndex = "1";
         
         this.host.classList.add("arkeos-split-target");
 
-        if(this.host.getAttribute("ratio")) {
-            let host_ratio = document.createAttribute("ratio");
-            host_ratio.value = "100";
-            this.host.setAttributeNode(host_ratio);
-        }
-
-        if(this.host.getAttribute("location")) {
-            let host_location = document.createAttribute("location");
-            host_location.value = "fill";
-            this.host.setAttributeNode(host_location);
-        }
-
-        if(this.host.getAttribute("caption")) {
-            let host_caption = document.createAttribute("caption");
-            host_caption.value = "";
-            this.host.setAttributeNode(host_caption);
-        }
-
-        if(this.host.getAttribute("master")) {
-            let host_master = document.createAttribute("master");
-            host_master.value = null;
-            this.host.setAttributeNode(host_master);
-        }
+        this.promise.then(() => {
+            this.ratio = this.getAttribute("ratio");
+            this.caption = this.getAttribute("caption");
+            this.location = this.getAttribute("location");
+        });
     }
 
-    update() {
+    update(_parent?: ArkeosSplitPanel) {
+        if(_parent) {
+            this._parent = _parent;
+        }
+
+        this._ratio = parseFloat(this.getAttribute("ratio")) / 100.0;
+        
         if(this._parent) {
-            if(this._parent["orientation"] == "vertical") {
+            if(this._parent.getAttribute("orientation") === "vertical") {
                 this.host.style.width = `${this._parent.host.clientWidth * this._ratio - this._parent.adjustWidth}px`; 
                 this.host.style.height = "100%";
             } else {
