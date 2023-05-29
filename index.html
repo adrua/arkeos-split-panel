@@ -1,16 +1,35 @@
+<style>
+    arkeos-panel {
+        border: 1px;
+        border-color: blueviolet;
+        border-style: solid;
+    }
+
+    #component-test {
+        width: 50%; 
+        height: 80%; 
+        max-height: 80%; 
+        border: 1px; 
+        border-color: blue;
+        border-style: double;
+    }
+</style>
 <div id="libary-test"></div>
 
-<div style="width: 100%; height: 80%; max-height: 80%; " id="component-test">
-    <arkeos-split-panel orientation="horizontal">
-        <arkeos-panel ratio="70" orientation="horizontal">
-            <arkeos-split-panel orientation="vertical">
-                <arkeos-panel ratio="70">
-                    Top left panel
+<div id="component-test">
+    <arkeos-split-panel orientation="column">
+        <arkeos-panel ratio="70">
+            <arkeos-split-panel orientation="row">
+                <arkeos-panel ratio="40">
+                    Left panel
                 </arkeos-panel>
                 <arkeos-panel ratio="30">
-                    Top right panel
-                </arkeos-panel>            
-            </arkeos-split-panel>                
+                        Middle panel
+                </arkeos-panel>    
+                <arkeos-panel ratio="30">
+                    Right panel
+            </arkeos-panel>    
+        </arkeos-split-panel>
         </arkeos-panel>
         <arkeos-panel ratio="30">
                 Bottom panel

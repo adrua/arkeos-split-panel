@@ -27,16 +27,15 @@ export class ArkeosPanel extends XTagElement  {
         this._location = value;
     }
 
-    private _ratio = 1; //== 100%
+    private _ratio = 100; //== 100%
 
     get 'ratio::attr'(): string | number  {
-        return this._ratio * 100.0;
+        return this._ratio;
     }
 
     set 'ratio::attr'(value: string | number) {
-        this._ratio = parseFloat(value.toString()) / 100.0;
-        
-        this.promise.then(() => this.update());
+        this._ratio = parseFloat(value.toString());   
+        this.update();     
     }
 
     constructor() {
@@ -45,35 +44,24 @@ export class ArkeosPanel extends XTagElement  {
         this.host = this as unknown as HTMLElement;
 
         this.host.style.overflow = "auto";
-        this.host.style.position = "absolute";
-        this.host.style.borderWidth = "1px";
-        this.host.style.borderStyle = "solid";
-        this.host.style.borderColor = "green";
         this.host.style.zIndex = "1";
-        
-        this.host.classList.add("arkeos-split-target");
 
-        this.promise.then(() => {
-            this.ratio = this.getAttribute("ratio");
-            this.caption = this.getAttribute("caption");
-            this.location = this.getAttribute("location");
-        });
+        this.host.classList.add("arkeos-split-target");
     }
 
-    update(_parent?: ArkeosSplitPanel) {
-        if(_parent) {
-            this._parent = _parent;
-        }
-
-        this._ratio = parseFloat(this.getAttribute("ratio")) / 100.0;
-        
+    public setParent(_parent: ArkeosSplitPanel) {
+        this._parent = _parent;
+        this.update();
+    }
+    
+    update() {        
         if(this._parent) {
-            if(this._parent.getAttribute("orientation") === "vertical") {
-                this.host.style.width = `${this._parent.host.clientWidth * this._ratio - this._parent.adjustWidth}px`; 
-                this.host.style.height = "100%";
-            } else {
+            if(this._parent.orientation === "column") {
                 this.host.style.width = "100%";
-                this.host.style.height = `${this._parent.host.clientHeight * this._ratio - this._parent.adjustHeight}px`; 
+                this.host.style.height = `${this._ratio}%`; 
+            } else {
+                this.host.style.width = `${this._ratio}%`; 
+                this.host.style.height = "100%";
             }
         }
     }
